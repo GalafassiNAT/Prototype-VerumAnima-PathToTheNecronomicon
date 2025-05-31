@@ -1,0 +1,7 @@
+IMAGE   img_background    "backgrounds/level1_bg.png" BEST
+IMAGE   img_hud           "hud/hud.png" BEST
+
+PALETTE level1_pal        "levels/level1/level1_pal.pal"
+MAP     level1_map        "levels/level1/level1_map.tmx" map_layer BEST 0
+
+SPRITE  spr_plat          "sprites/player.png"      3 5 FAST 3
