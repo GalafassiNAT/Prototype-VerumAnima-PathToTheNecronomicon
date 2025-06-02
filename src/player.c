@@ -8,6 +8,14 @@
 
 GameObject player;
 
+#define ANIM_PLAYER_IDLE 	0
+#define ANIM_PLAYER_UP 		1
+#define ANIM_PLAYER_DOWN 	2
+#define ANIM_PLAYER_LEFT 	3
+#define ANIM_PLAYER_RIGHT 	4
+
+
+
 ////////////////////////////////////////////////////////////////////////////
 // PRIVATE MEMBERS
 
@@ -62,6 +70,8 @@ void PLAYER_update() {
 	GAMEOBJECT_update_boundbox(player.x, player.y, &player);
 	SPR_setPosition(player.sprite, player.box.left + player.w_offset, player.box.top + player.h_offset);
 	SPR_setAnim(player.sprite, player.anim);
+	player.anim = ANIM_PLAYER_IDLE; 
+
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -81,12 +91,12 @@ static inline bool on_ground() {
 static inline void PLAYER_get_input_platformer() {
 	if (key_down(JOY_1, BUTTON_RIGHT)) {
 		player.speed_x = PLAYER_SPEED;
-		player.anim = 0;
+		player.anim = ANIM_PLAYER_RIGHT;
 	}
 	else 
 	if (key_down(JOY_1, BUTTON_LEFT)) {
 		player.speed_x = -PLAYER_SPEED;
-		player.anim = 4;
+		player.anim = ANIM_PLAYER_LEFT;
 	} else {
 		player.speed_x = 0;
 	}
@@ -184,45 +194,41 @@ static inline void PLAYER_get_input_dir8() {
 
 	if (key_down(JOY_1, BUTTON_RIGHT)) {
 		player.speed_x = PLAYER_SPEED;
-		player.anim = 0;
+		player.anim = ANIM_PLAYER_RIGHT;
 
 		if (key_down(JOY_1, BUTTON_UP)) {
 			player.speed_x =  PLAYER_SPEED45;
 			player.speed_y = -PLAYER_SPEED45;
-			player.anim = 1;
 			return;
 		} 
 		else if (key_down(JOY_1, BUTTON_DOWN)) {
 			player.speed_x =  PLAYER_SPEED45;
 			player.speed_y =  PLAYER_SPEED45;
-			player.anim = 7;
 			return;
 		}
 	} 
 	else if (key_down(JOY_1, BUTTON_LEFT)) {
 		player.speed_x = -PLAYER_SPEED;
-		player.anim = 4;
+		player.anim = ANIM_PLAYER_LEFT;
 
 		if (key_down(JOY_1, BUTTON_UP)) {
 			player.speed_x = -PLAYER_SPEED45;
 			player.speed_y = -PLAYER_SPEED45;
-			player.anim = 3;
 			return;
 		}
 		else if (key_down(JOY_1, BUTTON_DOWN)) {
 			player.speed_x = -PLAYER_SPEED45;
 			player.speed_y =  PLAYER_SPEED45;
-			player.anim = 5;
 			return;
 		}
 	}
 
 	if (key_down(JOY_1, BUTTON_UP)) {
 		player.speed_y = -PLAYER_SPEED;
-		player.anim = 2;
+		player.anim = ANIM_PLAYER_UP;
 	}
 	else if (key_down(JOY_1, BUTTON_DOWN)) {
 		player.speed_y = PLAYER_SPEED;
-		player.anim = 6;
+		player.anim = ANIM_PLAYER_DOWN;
 	} 
 }

@@ -8,6 +8,8 @@
 static fix16 offset_pos[SCREEN_TILES_H] = {0}; // 224 px / 8 px = 28
 static fix16 offset_speed[SCREEN_TILES_H] = {0};
 static s16 values[SCREEN_TILES_H] = {0};
+static s16 new_start_offset = 103;
+static u8 mid = (SCREEN_TILES_H / 2) + 1;
 
 static inline void set_offset_speed(u8 start, u8 len, fix16 speed);
 
@@ -18,14 +20,15 @@ u16 BACKGROUND_init(u16 ind, f16 start_speed, f16 speed_increase) {
 	VDP_setPlaneSize(64, 64, TRUE);
 	
 	// PAL_setPalette(PAL_BACKGROUND, img_background.palette->data, CPU);
-	VDP_drawImageEx(BG_BACKGROUND, &img_background, TILE_ATTR_FULL(PAL_BACKGROUND, 0, 0, 0, ind), 0, 0, TRUE, DMA);
+	VDP_drawImageEx(BG_BACKGROUND, &img_background, TILE_ATTR_FULL(PAL_BACKGROUND, 0, 0, 0, ind), new_start_offset, 0, TRUE, DMA);
 	
 	VDP_setScrollingMode(HSCROLL_TILE , VSCROLL_COLUMN);
 	
-	u8 mid = SCREEN_TILES_H / 2;
+	
+
 
 	for (u8 i =0; i < SCREEN_TILES_H; i++) {
-		offset_pos[i] = FIX16(0.0); 
+		offset_pos[i] = FIX16(new_start_offset); 
 	}
 
 	// f16 speed = start_speed;
@@ -49,15 +52,14 @@ u16 BACKGROUND_init(u16 ind, f16 start_speed, f16 speed_increase) {
 // UPDATE
 
 void BACKGROUND_update() {
-	u8 mid = SCREEN_TILES_H / 2;
 
 	for (u8 i = 0; i < mid; i++) {
-		values[i] = 0;
+		values[i] = new_start_offset;
 	}
 
 	for (u8 i = mid; i < SCREEN_TILES_H; i++) {
 		// restart plane position when reaching screen width
-		// if (offset_pos[i] > FIX16(SCREEN_W)) {
+		// if (offset_pos[i] > FIX16(SCREEN_W / 2)) {
 		// 	offset_pos[i] -= FIX16(SCREEN_W);
 		// }
 

@@ -40,7 +40,7 @@ u16 LEVEL_init(u16 ind) {
 	map = MAP_create(&level1_map, BG_MAP, TILE_ATTR_FULL(PAL_MAP, FALSE, FALSE, FALSE, ind));
 	
 	LEVEL_scroll_map(0, 0);
-	LEVEL_generate_screen_collision_map(IDX_EMPTY, IDX_WALL_FIRST, IDX_WALL_LAST);
+	// LEVEL_generate_screen_collision_map(IDX_EMPTY, IDX_WALL_FIRST, IDX_WALL_LAST);
 	
 	// ind += level1_tiles.numTile;
 

@@ -69,16 +69,17 @@ u8 bg_colors_delay = 5;
 const u16 const bg_color_glow[] = {0x0, 0x222, 0x444, 0x666, 0x888};
 
 #define MAX_OBJ 78
-GameObject balls_list[MAX_OBJ];
+#define MAX_BATS 5
+GameObject bat_list[MAX_BATS];
 
 ////////////////////////////////////////////////////////////////////////////
 // GAME INIT
 
-u16** ball_indexes;
+u16** bat_indexes;
 
 static void frame_changed(Sprite* sprite) {
     // get VRAM tile index for current animation of this sprite
-    u16 tileIndex = ball_indexes[sprite->animInd][sprite->frameInd];
+    u16 tileIndex = bat_indexes[sprite->animInd][sprite->frameInd];
 	
     // manually set tile index for the current frame (preloaded in VRAM)
     SPR_setVRAMTileIndex(sprite, tileIndex);
@@ -94,7 +95,7 @@ void game_init() {
 	#ifdef DEBUG
 	VDP_setTextPlane(BG_BACKGROUND);
 	#else	
-	ind += BACKGROUND_init(ind, FIX16(-1.06), FIX16(-0.05));
+	ind += BACKGROUND_init(ind, FIX16(-0.80), FIX16(-0.05));
 	#endif
 
 	ind += LEVEL_init(ind);
@@ -148,9 +149,9 @@ static inline void game_update() {
 	#ifndef DEBUG
 	BACKGROUND_update();
 	#endif
-
+	
 	#if MAP_SOLUTION == MAP_BY_COMPACT_MAP
-	LEVEL_update_camera(&player);
+	// LEVEL_update_camera(&player);
 	#endif
 	// color_effects();
 }
