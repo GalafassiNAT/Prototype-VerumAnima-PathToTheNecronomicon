@@ -64,7 +64,7 @@ void PLAYER_update() {
 	}
 
 	// GAMEOBJECT_wrap_screen(&player);
-	// GAMEOBJECT_clamp_screen(&player);
+	GAMEOBJECT_clamp_screen(&player);
 	
 	// update VDP/SGDK
 	GAMEOBJECT_update_boundbox(player.x, player.y, &player);

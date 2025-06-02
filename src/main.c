@@ -59,6 +59,7 @@
 #include "engine/level.h"
 #include "player.h"
 #include "hud.h"
+#include "enemy.h"
 
 // index for tiles in VRAM (first tile reserved for SGDK)
 // u16 ind = 1;
@@ -89,7 +90,7 @@ static void frame_changed(Sprite* sprite) {
 void game_init() {
 	VDP_setScreenWidth320();
 	SPR_init();
-	
+	ENEMY_init_system();
 	// init BACKGROUND, LEVEL AND HUD ///////////////////////////////
 
 	#ifdef DEBUG
@@ -111,7 +112,8 @@ void game_init() {
 	// init GAME OBJECTS ////////////////////////////////////////////
 
 	PLAYER_init(ind);
-
+	ENEMY_spawn_bat(200,60, &ind);
+	ENEMY_spawn_bat(250,80, &ind);
 	// init_balls();
 }
 
@@ -144,6 +146,7 @@ static inline void game_update() {
 	update_input();
 
 	PLAYER_update();
+	ENEMY_update_all();
 	// update_enemies();
 
 	#ifndef DEBUG

@@ -6,5 +6,6 @@ extern const Image img_hud;
 extern const Palette level1_pal;
 extern const MapDefinition level1_map;
 extern const SpriteDefinition spr_plat;
+extern const SpriteDefinition spr_bat;
 
 #endif // _RES_RESOURCES_H_
