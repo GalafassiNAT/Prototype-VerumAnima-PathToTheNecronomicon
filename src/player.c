@@ -35,7 +35,7 @@ u16 PLAYER_init(u16 ind) {
 	for (u8 i = 0; i < MAX_PLAYER_BULLETS; i++) {
 		player_bullets[i].health = 0; // not active
 
-		u16 bullet_sprite_tiles = GAMEOBJECT_init(&player_bullets[i], &spr_player_shot, -64,-64, 0,0, PAL_PLAYER, ind);
+		u16 bullet_sprite_tiles = GAMEOBJECT_init(&player_bullets[i], &spr_player_shot, -64,-64, 0,0, PAL_ENEMY, ind);
 		ind += bullet_sprite_tiles;
 		SPR_setVisibility(player_bullets[i].sprite, HIDDEN);
 	}
