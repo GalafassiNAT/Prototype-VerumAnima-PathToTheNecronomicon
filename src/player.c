@@ -7,13 +7,14 @@
 #include "hud.h"
 
 GameObject player;
+GameObject player_bullets[MAX_PLAYER_BULLETS];
+#define BULLET_SPEED FIX16(4)
 
 #define ANIM_PLAYER_IDLE 	0
 #define ANIM_PLAYER_UP 		1
 #define ANIM_PLAYER_DOWN 	2
 #define ANIM_PLAYER_LEFT 	3
 #define ANIM_PLAYER_RIGHT 	4
-
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -30,6 +31,15 @@ static inline bool on_ground();
 u16 PLAYER_init(u16 ind) {
 	ind += GAMEOBJECT_init(&player, &spr_plat, SCREEN_W/2-12, SCREEN_H/2-12, -16, -16, PAL_PLAYER, ind);
 	player.health = PLAYER_MAX_HEALTH;
+
+	for (u8 i = 0; i < MAX_PLAYER_BULLETS; i++) {
+		player_bullets[i].health = 0; // not active
+
+		u16 bullet_sprite_tiles = GAMEOBJECT_init(&player_bullets[i], &spr_player_shot, -64,-64, 0,0, PAL_PLAYER, ind);
+		ind += bullet_sprite_tiles;
+		SPR_setVisibility(player_bullets[i].sprite, HIDDEN);
+	}
+
 	return ind;
 }
 
@@ -73,6 +83,35 @@ void PLAYER_update() {
 	player.anim = ANIM_PLAYER_IDLE; 
 
 }
+
+////////////////////////////////////////////////////////////////////////////
+// SHOOT
+void PLAYER_shoot() {
+	for (u8 i = 0; i < MAX_PLAYER_BULLETS; i++) {
+		if (player_bullets[i].health == 0) {
+			GameObject *bullet = &player_bullets[i];
+			bullet->health = 1; // active
+
+			bullet->y = player.y + FIX16(player.h/2) - FIX16(bullet->h/2);
+			bullet->speed_y = 0;
+
+			bullet->x = player.x + FIX16(player.w);
+
+			bullet->speed_x = BULLET_SPEED;
+			bullet->speed_y = 0;
+
+			SPR_setHFlip(bullet->sprite, FALSE); // default right
+			GAMEOBJECT_update_boundbox(bullet->x, bullet->y, bullet);
+			SPR_setPosition(bullet->sprite, bullet->box.left + bullet->w_offset, bullet->box.top + bullet->h_offset);
+			SPR_setVisibility(bullet->sprite, VISIBLE);
+
+			return;
+		}
+	}
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
