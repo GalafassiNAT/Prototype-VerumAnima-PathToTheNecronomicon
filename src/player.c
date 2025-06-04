@@ -30,6 +30,7 @@ static inline bool on_ground();
 
 u16 PLAYER_init(u16 ind) {
 	ind += GAMEOBJECT_init(&player, &spr_plat, SCREEN_W/2-12, SCREEN_H/2-12, -16, -16, PAL_PLAYER, ind);
+	player.mana = 0;
 	player.health = PLAYER_MAX_HEALTH;
 
 	u16 bullet_color = RGB24_TO_VDPCOLOR(0xE00000); // red
@@ -42,6 +43,8 @@ u16 PLAYER_init(u16 ind) {
 		u16 bullet_sprite_tiles = GAMEOBJECT_init(&player_bullets[i], &spr_player_shot, -64,-64, 0,0, PAL_MAP, ind);
 		ind += bullet_sprite_tiles;
 		SPR_setVisibility(player_bullets[i].sprite, HIDDEN);
+		SPR_setAnimAndFrame(player_bullets[i].sprite, 0, 0); // default animation
+		SPR_setAnimationLoop(player_bullets[i].sprite, FALSE);
 
 	}
 

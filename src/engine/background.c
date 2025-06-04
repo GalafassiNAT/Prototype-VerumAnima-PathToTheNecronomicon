@@ -1,5 +1,5 @@
 #include "background.h"
-#include "src/globals.h"
+#include "globals.h"
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -11,6 +11,8 @@ static fix16 offset_speed[SCREEN_TILES_H] = {0};
 static s16 values[SCREEN_TILES_H] = {0};
 static s16 new_start_offset = 103;
 static u8 mid = (SCREEN_TILES_H / 2) + 1;
+static u8 top_mountain = (69 / 8); 
+
 
 static inline void set_offset_speed(u8 start, u8 len, fix16 speed);
 
@@ -38,9 +40,9 @@ u16 BACKGROUND_init(u16 ind, f16 start_speed, f16 speed_increase) {
 	// 	set_offset_speed(SCREEN_TILES_H-i-1, 1, speed);
 	// 	speed += speed_increase;
 	// }
-    set_offset_speed(0, mid, FIX16(0.0));
 	
 	fix16 uniform_speed = start_speed;
+	set_offset_speed(top_mountain, mid, fix16Mul(speed_increase, FIX16(2.0))); // 0.5x speed for top mountain
 	set_offset_speed(mid, SCREEN_TILES_H - mid, uniform_speed);
 
 	// set the window to 1 to last row
@@ -57,8 +59,8 @@ void BACKGROUND_update() {
 	for (u8 i = 0; i < mid; i++) {
 		values[i] = new_start_offset;
 	}
-
-	for (u8 i = mid; i < SCREEN_TILES_H; i++) {
+	
+	for (u8 i = 0; i < SCREEN_TILES_H; i++) {
 		// restart plane position when reaching screen width
 		// if (offset_pos[i] > FIX16(SCREEN_W / 2)) {
 		// 	offset_pos[i] -= FIX16(SCREEN_W);
@@ -81,13 +83,16 @@ void BACKGROUND_update() {
  * Utilitary function to simplify setting more than one offset_speed vector position
  */
 static inline void set_offset_speed(u8 start, u8 len, fix16 speed) {
-	if (start + len > SCREEN_TILES_H) {
-		if (start >= SCREEN_TILES_H) return;
-		len = SCREEN_TILES_H - start; 
+	if (start >= SCREEN_TILES_H) return; // out of bounds
+
+	u8 end_exclusive = start + len;
+	if (end_exclusive > SCREEN_TILES_H) {
+		end_exclusive = SCREEN_TILES_H; // limit to max size
 	}
+	
 	if (len == 0) return; 
 	
-	for (u8 i = start; i <= start + len; i++) {
+	for (u8 i = start; i <= end_exclusive; i++) {
 		offset_speed[i] = speed;
 	}
 }

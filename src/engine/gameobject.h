@@ -27,6 +27,7 @@ typedef struct {
 	s8 h_offset;
 	u8 anim;
 	u8 health;
+	u8 mana;
 } GameObject;
 
 ////////////////////////////////////////////////////////////////////////////
@@ -41,5 +42,6 @@ void GAMEOBJECT_update_boundbox(f16 x, f16 y, GameObject* obj);
 void GAMEOBJECT_clamp_screen(GameObject* obj);
 void GAMEOBJECT_wrap_screen(GameObject* obj);
 void GAMEOBJECT_bounce_off_screen(GameObject* obj);
+bool GAMEOBJECT_check_collision(GameObject* obj1, GameObject* obj2);
 
 #endif // _STRUCTS_H_
