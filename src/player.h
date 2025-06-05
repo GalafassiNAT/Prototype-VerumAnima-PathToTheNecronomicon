@@ -10,6 +10,7 @@
 
 #define MAX_PLAYER_BULLETS 8
 extern GameObject player_bullets[MAX_PLAYER_BULLETS];
+extern u8 PLAYER_bullet_dmg;
 
 
 // #define PLAYER_SPEED45 FIX16(0.707)

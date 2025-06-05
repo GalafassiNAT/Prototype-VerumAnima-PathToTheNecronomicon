@@ -7,8 +7,13 @@
 #include "hud.h"
 
 GameObject player;
+
+// Bullet system
 GameObject player_bullets[MAX_PLAYER_BULLETS];
+u8 PLAYER_bullet_dmg = 5;
 #define BULLET_SPEED FIX16(4)
+
+
 
 #define ANIM_PLAYER_IDLE 	0
 #define ANIM_PLAYER_UP 		1

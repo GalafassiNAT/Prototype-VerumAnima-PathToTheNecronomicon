@@ -26,7 +26,7 @@ typedef struct {
 	s8 w_offset;
 	s8 h_offset;
 	u8 anim;
-	u8 health;
+	s8 health;
 	u8 mana;
 } GameObject;
 

@@ -1,6 +1,7 @@
 #include "enemy.h"
 #include "globals.h"
 #include "resources.h"
+#include "player.h"
 
 GameObject enemies_bat[MAX_BATS];
 u8 active_bats_count = 0;
@@ -29,7 +30,7 @@ void ENEMY_spawn_bat(s16 x, s16 y, u16* current_vram_tile_index) {
 }
 
 void ENEMY_update_all() {
-	for (u8 i = 0; i < active_bats_count; i++) {
+	for (s8 i = MAX_BATS - 1; i >= 0; i--) {
         GameObject* enemy = &enemies_bat[i]; 
 
         if (enemy->health > 0) {
@@ -48,7 +49,38 @@ void ENEMY_update_all() {
             // ...
 
             GAMEOBJECT_update_boundbox(enemy->x, enemy->y, enemy); 
-            SPR_setPosition(enemy->sprite, enemy->box.left + enemy->w_offset, enemy->box.top + enemy->h_offset);
+            
+
+
+            for (u8 j = 0; j < MAX_PLAYER_BULLETS; j++) {
+                GameObject *bullet = &player_bullets[j];
+
+                if (bullet->health > 0) {
+                    
+                    if (GAMEOBJECT_check_collision(enemy, bullet)) {
+                        enemy->health -= PLAYER_bullet_dmg;
+                        bullet->health = 0; // deactivate bullet
+                        SPR_setVisibility(bullet->sprite, HIDDEN);
+
+
+                        if (enemy->health <= 0) {
+
+                            // if (i < active_bats_count - 1) {
+                            //     // Move the last active bat to the current position
+                            //     enemies_bat[i] = enemies_bat[active_bats_count - 1];
+                            // }
+                            enemy->health = 0;
+                            SPR_setVisibility(enemy->sprite, HIDDEN);
+                            active_bats_count--;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (enemy->health > 0) {
+                SPR_setVisibility(enemy->sprite, VISIBLE);
+                SPR_setPosition(enemy->sprite, enemy->box.left + enemy->w_offset, enemy->box.top + enemy->h_offset);
+            }
         }
     }
 }
