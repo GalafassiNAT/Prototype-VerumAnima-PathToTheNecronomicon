@@ -25,6 +25,42 @@ u16 GAMEOBJECT_init(GameObject* const obj, const SpriteDefinition* const sprite,
 	return obj->sprite->definition->maxNumTile;
 }
 
+
+/////////////////////////////////////////////////////////////////////////////
+// POOL MANAGEMENT
+void GAMEOBJECT_pool_init(GameObject_Pool* pool, GameObject* object_array, GameObject_node* node_array, u16 size) {
+	pool->active_h = NULL;
+	pool->free_h = &node_array[0];
+
+	for (u16 i = 0; i < size; i++) {
+		node_array[i].g_object = &object_array[i];
+
+		if (i < size - 1) {
+			node_array[i].next = &node_array[i + 1];
+		} else {
+			node_array[i].next = NULL;
+		}
+	}
+}
+
+GameObject* GAMEOBJECT_pool_alloc(GameObject_Pool* pool) {
+	GameObject_node* node_to_alloc = pool->free_h;
+
+	if (node_to_alloc == NULL) return NULL;
+
+	pool->free_h = node_to_alloc->next;
+
+	node_to_alloc->next = pool->active_h;
+	pool->active_h = node_to_alloc;
+
+	return node_to_alloc->g_object;
+}
+
+void GAMEOBJECT_pool_free(GameObject_Pool* pool, GameObject* obj_to_free) {
+	GameObject_node* current = pool->active_h;
+	GameObject_node* prev = NULL;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // UPDATE
 

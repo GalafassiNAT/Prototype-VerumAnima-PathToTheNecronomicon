@@ -46,7 +46,6 @@ void ENEMY_update_all() {
                 enemy->speed_x = -enemy->speed_x;
                 SPR_setHFlip(enemy->sprite, TRUE); 
             }
-            // ...
 
             GAMEOBJECT_update_boundbox(enemy->x, enemy->y, enemy); 
             
