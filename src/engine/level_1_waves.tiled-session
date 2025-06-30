@@ -1,0 +1,32 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "levels/level1_waves.tmx": {
+            "scale": 0.33,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 906.0606060606062,
+                "y": 198.48484848484838
+            }
+        }
+    },
+    "map.height": 30,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 120,
+    "openFiles": [
+    ],
+    "project": "level_1_waves.tiled-project",
+    "property.type": "int",
+    "recentFiles": [
+    ],
+    "resizeMap.removeObjects": false
+}

@@ -59,6 +59,27 @@ GameObject* GAMEOBJECT_pool_alloc(GameObject_Pool* pool) {
 void GAMEOBJECT_pool_free(GameObject_Pool* pool, GameObject* obj_to_free) {
 	GameObject_node* current = pool->active_h;
 	GameObject_node* prev = NULL;
+
+	while (current != NULL) {
+		if (current->g_object == obj_to_free) {
+			if (prev == NULL) {
+				pool->active_h = current->next;
+			} else {
+				prev->next = current->next;
+			}
+
+			current->next = pool->free_h;
+			pool->free_h = current;
+
+			if(obj_to_free->sprite != NULL) {
+				SPR_setVisibility(obj_to_free->sprite, HIDDEN);
+			}
+
+			return;
+		}
+		prev = current;
+		current = current->next;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////
