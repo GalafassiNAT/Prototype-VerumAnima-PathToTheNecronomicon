@@ -37,15 +37,15 @@ static void LEVEL_scroll_and_update_collision(s16 offset_x, s16 offset_y);
 u16 LEVEL_init(u16 ind) {
 	PAL_setPalette(PAL_MAP, level1_pal.data, DMA);
 	// VDP_loadTileSet(&level1_tiles, ind, DMA);
-	map = MAP_create(&level1_map, BG_MAP, TILE_ATTR_FULL(PAL_MAP, FALSE, FALSE, FALSE, ind));
+	// map = MAP_create(&level1_map, BG_MAP, TILE_ATTR_FULL(PAL_MAP, FALSE, FALSE, FALSE, ind));
 	
-	LEVEL_scroll_map(0, 0);
+	// LEVEL_scroll_map(0, 0);
 	// LEVEL_generate_screen_collision_map(IDX_EMPTY, IDX_WALL_FIRST, IDX_WALL_LAST);
 	
 	// ind += level1_tiles.numTile;
 
 	// start tiles BIT MAP with 1's
-	memsetU32((u32*)items_table, 0xFFFFFFFF, NUMBER_OF_ROOMS * NUMBER_OF_32BIT_BITMAPS);
+	// memsetU32((u32*)items_table, 0xFFFFFFFF, NUMBER_OF_ROOMS * NUMBER_OF_32BIT_BITMAPS);
 
 	return ind;
 }
@@ -74,17 +74,17 @@ void LEVEL_remove_tileXY(s16 x, s16 y, u8 new_index) {
  * OBS: Definir corretamente MAP_W e MAP_H em <globais.h>.
  */
 void LEVEL_check_map_boundaries(GameObject* obj) {
-	if (fix16ToInt(obj->x) + screen_x > MAP_W - obj->w) {
+	if (F16_toInt(obj->x) + screen_x > MAP_W - obj->w) {
 		obj->x = FIX16(SCREEN_W - obj->w);
 	} else
-	if (fix16ToInt(obj->x) + screen_x < 0) {
+	if (F16_toInt(obj->x) + screen_x < 0) {
 		obj->x = 0;
 	}
 
-	if (fix16ToInt(obj->y) + screen_y > MAP_H - obj->h) {
+	if (F16_toInt(obj->y) + screen_y > MAP_H - obj->h) {
 		obj->y = FIX16(SCREEN_H - obj->h);
 	} else
-	if (fix16ToInt(obj->y) + screen_y < 0) {
+	if (F16_toInt(obj->y) + screen_y < 0) {
 		obj->y = 0;
 	}
 }

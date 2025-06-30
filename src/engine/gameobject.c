@@ -89,10 +89,10 @@ void GAMEOBJECT_pool_free(GameObject_Pool* pool, GameObject* obj_to_free) {
  * Updates GameObject's bound box (integer values) from positions and size (fix16).
  */
 void GAMEOBJECT_update_boundbox(f16 x, f16 y, GameObject* obj) {
-	obj->box.left  = fix16ToInt(x);
-	obj->box.top   = fix16ToInt(y);
-	obj->box.right = fix16ToInt(x) + obj->w;// - 1;
-	obj->box.bottom= fix16ToInt(y) + obj->h;// - 1;
+	obj->box.left  = F16_toInt(x);
+	obj->box.top   = F16_toInt(y);
+	obj->box.right = F16_toInt(x) + obj->w;// - 1;
+	obj->box.bottom= F16_toInt(y) + obj->h;// - 1;
 }
 
 /**
@@ -107,8 +107,8 @@ void GAMEOBJECT_clamp_screen(GameObject* obj) {
  * Wraps object around screen bounds.
  */
 void GAMEOBJECT_wrap_screen(GameObject* obj) {
-	WRAP(obj->x, -fix16Div(obj->w, 2), FIX16(SCREEN_W) - obj->w/2)
-	WRAP(obj->y, -fix16Div(obj->h, 2), FIX16(SCREEN_H) - obj->h/2)
+	WRAP(obj->x, -F16_div(obj->w, 2), FIX16(SCREEN_W) - obj->w/2);
+	WRAP(obj->y, -F16_div(obj->h, 2), FIX16(SCREEN_H) - obj->h/2);
 }
 
 /**

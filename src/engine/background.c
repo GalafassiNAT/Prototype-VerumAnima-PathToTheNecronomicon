@@ -42,7 +42,7 @@ u16 BACKGROUND_init(u16 ind, f16 start_speed, f16 speed_increase) {
 	// }
 	
 	fix16 uniform_speed = start_speed;
-	set_offset_speed(top_mountain, mid, fix16Mul(speed_increase, FIX16(2.0))); // 0.5x speed for top mountain
+	set_offset_speed(top_mountain, mid, F16_mul(speed_increase, FIX16(2.0))); // 0.5x speed for top mountain
 	set_offset_speed(mid, SCREEN_TILES_H - mid, uniform_speed);
 
 	// set the window to 1 to last row
@@ -70,7 +70,7 @@ void BACKGROUND_update() {
 		offset_pos[i] += offset_speed[i];
 		
 		// cast to integer to input on VDP
-		values[i] = fix16ToInt(offset_pos[i]);
+		values[i] = F16_toInt(offset_pos[i]);
 	}
 
 	VDP_setHorizontalScrollTile(BG_BACKGROUND, 0, values, SCREEN_TILES_H, DMA);
