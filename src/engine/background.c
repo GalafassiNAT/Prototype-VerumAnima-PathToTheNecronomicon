@@ -92,7 +92,7 @@ static inline void set_offset_speed(u8 start, u8 len, fix16 speed) {
 	
 	if (len == 0) return; 
 	
-	for (u8 i = start; i <= end_exclusive; i++) {
+	for (u8 i = start; i < end_exclusive; i++) {
 		offset_speed[i] = speed;
 	}
 }

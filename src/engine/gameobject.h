@@ -31,7 +31,7 @@ typedef struct {
 } GameObject;
 
 
-typedef struct {
+typedef struct GameObject_node {
 	GameObject* g_object;
 	struct GameObject_node* next;
 } GameObject_node;

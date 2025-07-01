@@ -63,15 +63,15 @@
 
 // index for tiles in VRAM (first tile reserved for SGDK)
 // u16 ind = 1;
-u16 ind = TILE_USER_INDEX;
+u16 ind;
 
 // glow color effect
 u8 bg_colors_delay = 5;
-const u16 const bg_color_glow[] = {0x0, 0x222, 0x444, 0x666, 0x888};
+const u16 bg_color_glow[] = {0x0, 0x222, 0x444, 0x666, 0x888};
 
 #define MAX_OBJ 78
-#define MAX_BATS 5
-GameObject bat_list[MAX_BATS];
+// #define MAX_BATS 52
+// GameObject bat_list[MAX_BATS];
 
 ////////////////////////////////////////////////////////////////////////////
 // GAME INIT
@@ -88,8 +88,8 @@ static void frame_changed(Sprite* sprite) {
 
 
 void game_init() {
+	ind = TILE_USER_INDEX;
 	VDP_setScreenWidth320();
-	SPR_init();
 	ENEMY_init_system();
 	// init BACKGROUND, LEVEL AND HUD ///////////////////////////////
 
@@ -97,9 +97,10 @@ void game_init() {
 	VDP_setTextPlane(BG_BACKGROUND);
 	#else	
 	ind += BACKGROUND_init(ind, FIX16(-0.80), FIX16(-0.05));
+	ind + HUD_init(ind);
 	#endif
 
-	ind += LEVEL_init(ind);
+	// ind += LEVEL_init(ind);
 	
 	#ifdef DEBUG
 	LEVEL_draw_map();
@@ -111,9 +112,9 @@ void game_init() {
 	
 	// init GAME OBJECTS ////////////////////////////////////////////
 
-	PLAYER_init(ind);
-	ENEMY_spawn_bat(200,60, &ind);
-	ENEMY_spawn_bat(250,80, &ind);
+	ind += PLAYER_init(ind);
+	ind += ENEMY_spawn_bat(200,60, ind); 
+	// ind += ENEMY_spawn_bat(250,80, ind);
 	// init_balls();
 }
 
@@ -146,7 +147,7 @@ static inline void game_update() {
 	update_input();
 
 	PLAYER_update();
-	ENEMY_update_all();
+	// ENEMY_update_all();
 	// update_enemies();
 
 	#ifndef DEBUG
@@ -163,6 +164,9 @@ static inline void game_update() {
 // MAIN
 
 int main(bool resetType) {
+	VDP_init();
+	SPR_init();
+
 	// Soft reset doesn't clear RAM. Can lead to bugs.
 	if (!resetType) {
 		SYS_hardReset();
@@ -175,10 +179,17 @@ int main(bool resetType) {
 	kprintf("Free RAM after Game Init: %d", MEM_getFree());
 
 	while (TRUE) {
+		KLog("--- Main game loop ---");
+		KLog("A - Chamando game_update...");
 		game_update();
 
+		KLog("B - Chamando SPR_update...");
 		SPR_update();
+
+		KLog("C - Chamando SYS_doVBlankProcess...");
 		SYS_doVBlankProcess();
+
+		KLog("D - Fim do quadro. Loop vai reiniciar.");
 	}
 
 	return 0;
