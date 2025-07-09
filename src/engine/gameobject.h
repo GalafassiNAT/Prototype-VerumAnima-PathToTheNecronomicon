@@ -25,9 +25,10 @@ typedef struct {
 	BoundBox box;
 	s8 w_offset;
 	s8 h_offset;
-	u8 anim;
 	s8 health;
+	u8 anim;
 	u8 mana;
+	EnemyType type;
 } GameObject;
 
 

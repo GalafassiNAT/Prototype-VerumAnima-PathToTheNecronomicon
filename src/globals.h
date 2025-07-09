@@ -78,6 +78,8 @@
 #define SCREEN_TILES_W SCREEN_W/8
 #define SCREEN_TILES_H SCREEN_H/8
 
+#define VIRTUAL_SCREEN_W 480 // one screen is 320x224, but we can use a virtual screen to spawn enemies out of the screen.
+
 // Map is made of 16x16 metatiles
 #define METATILE_W 16
 #define SCREEN_METATILES_W SCREEN_W/METATILE_W

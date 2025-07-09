@@ -9,14 +9,16 @@ typedef enum {
 } EnemyType;
 
 typedef struct {
+	s16 x;
+	s16 y;
+	u16 w;
+	u16 h;
 	u8 wave;
-	EnemyType type;
-	s16 start_x;
-	s16 start_y;
-} WaveEnemyDef;
+	u8 type;
+} WaveObjectData;
 
 typedef struct {
-	WaveEnemyDef* enemies;
+	const WaveObjectData* enemies;
 	u16 num_enemies;
 } WaveDef;
 

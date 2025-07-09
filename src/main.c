@@ -60,6 +60,7 @@
 #include "player.h"
 #include "hud.h"
 #include "enemy.h"
+#include "level_data.h"
 
 // index for tiles in VRAM (first tile reserved for SGDK)
 // u16 ind = 1;
@@ -72,6 +73,40 @@ const u16 bg_color_glow[] = {0x0, 0x222, 0x444, 0x666, 0x888};
 #define MAX_OBJ 78
 // #define MAX_BATS 52
 // GameObject bat_list[MAX_BATS];
+
+
+////////////////////////////////////////////////////////////////////////////
+// Wave Management
+static u16 wave_manager_cursor = 0;
+static u16 wave_manager_current_wave = 1;
+
+u16 wave_size = (sizeof(waves1) / sizeof(waves1[0]));
+
+static void handle_waves() {
+	if (ENEMY_get_active_count() == 0) {
+		if (wave_manager_cursor >= wave_size) return;
+	}
+
+	bool spawned_this_frame = FALSE;
+
+	while (wave_manager_cursor < wave_size) {
+		const WaveObjectData* data = (const WaveObjectData*) waves1[wave_manager_cursor];
+
+		if (data->wave != wave_manager_current_wave) break;
+
+		ENEMY_spawn(data->type, data->x, data->y, &ind);
+		wave_manager_cursor++;
+		spawned_this_frame = TRUE;
+	}
+
+	if (spawned_this_frame) {
+		wave_manager_current_wave++;
+	}
+
+
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////
 // GAME INIT
