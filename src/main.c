@@ -77,8 +77,8 @@ const u16 bg_color_glow[] = {0x0, 0x222, 0x444, 0x666, 0x888};
 
 ////////////////////////////////////////////////////////////////////////////
 // Wave Management
-static u16 wave_manager_cursor = 0;
-static u16 wave_manager_current_wave = 1;
+static u16 wave_manager_cursor;
+static u16 wave_manager_current_wave;
 
 u16 wave_size = (sizeof(waves1) / sizeof(waves1[0]));
 
@@ -105,7 +105,6 @@ static void handle_waves() {
 
 
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -145,12 +144,13 @@ void game_init() {
 	ind += HUD_init(ind);
 	#endif
 	
+	// Wave Management
+	wave_manager_cursor = 0;
+	wave_manager_current_wave = 1;
+
 	// init GAME OBJECTS ////////////////////////////////////////////
 
 	ind += PLAYER_init(ind);
-	ind += ENEMY_spawn_bat(200,60, ind); 
-	// ind += ENEMY_spawn_bat(250,80, ind);
-	// init_balls();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -179,11 +179,10 @@ void game_init() {
 // }
 
 static inline void game_update() {
+	handle_waves();
 	update_input();
-
 	PLAYER_update();
-	// ENEMY_update_all();
-	// update_enemies();
+	ENEMY_update_all();
 
 	#ifndef DEBUG
 	BACKGROUND_update();

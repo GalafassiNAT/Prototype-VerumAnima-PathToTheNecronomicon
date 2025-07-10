@@ -1,4 +1,5 @@
 #include <genesis.h>
+#pragma once
 
 typedef enum {
 	ENEMY_TYPE_BAT,
@@ -8,6 +9,14 @@ typedef enum {
 	ENEMY_TYPE_BOSS
 } EnemyType;
 
+typedef enum {
+	AI_BEHAVIOR_VERTICAL_BOUNCE,
+	AI_BEHAVIOR_MIRROR_BOUNCE,
+	AI_BEHAVIOR_FLY_STRAIGHT,
+	AI_BEHAVIOR_STATIC,
+} AIBehaviorType;
+
+
 typedef struct {
 	s16 x;
 	s16 y;
@@ -15,6 +24,7 @@ typedef struct {
 	u16 h;
 	u8 wave;
 	u8 type;
+	u8 behavior;
 } WaveObjectData;
 
 typedef struct {

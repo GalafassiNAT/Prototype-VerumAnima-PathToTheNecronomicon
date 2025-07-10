@@ -4,6 +4,7 @@
 #include <genesis.h>
 #include "sprite_eng.h"
 #include "globals.h"
+#include "level_data.h"
 
 typedef struct {
 	s16 left;
@@ -16,6 +17,8 @@ typedef struct {
 	Sprite* sprite;
 	f16 x;
 	f16 y;
+	u8 anim;
+
 	f16 next_x;
 	f16 next_y;
 	f16 speed_x;
@@ -25,10 +28,17 @@ typedef struct {
 	BoundBox box;
 	s8 w_offset;
 	s8 h_offset;
+
 	s8 health;
-	u8 anim;
 	u8 mana;
 	EnemyType type;
+
+	u8 ai_state;
+
+	u16 ai_timer;
+	f16 target_y;
+	f16 offset_x_from_anchor;
+	f16 offset_y_from_anchor;
 } GameObject;
 
 
