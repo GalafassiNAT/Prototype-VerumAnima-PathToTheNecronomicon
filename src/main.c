@@ -82,53 +82,61 @@ static u16 wave_manager_current_wave;
 
 u16 wave_size;
 
-// Em src/main.c
+
+
+// Esta é a função "maestro" que orquestra as hordas.
 
 static void handle_waves() {
-    // Só fazemos QUALQUER COISA se não houver mais inimigos na tela.
-    // Este 'if' agora protege toda a lógica de spawn.
     if (ENEMY_get_active_count() == 0) {
+        if (wave_manager_cursor >= wave_size) return;
 
-        // Se já percorremos todos os dados de hordas, não fazemos mais nada.
-        if (wave_manager_cursor >= wave_size) {
-            // TODO: Lógica de fim de fase aqui.
-            return;
-        }
+        // Array temporário para guardar os inimigos que vamos criar nesta horda
+        GameObject* new_members[MAX_ENEMIES_PER_FORMATION];
+        u16 member_count = 0;
+        const WaveObjectData* first_enemy_data = NULL;
 
-        bool spawned_this_frame = FALSE;
-        
-        // O loop 'while' continua como antes, ele vai spawnar todos os
-        // inimigos da horda atual ('wave_manager_current_wave').
+        // Loop para encontrar e SPAWNAR todos os inimigos da horda atual
         while (wave_manager_cursor < wave_size) {
-            const WaveObjectData* data = (const WaveObjectData*) waves1[wave_manager_cursor];
+            const WaveObjectData* data = (const WaveObjectData*)waves1[wave_manager_cursor];
 
+            if (data->wave != wave_manager_current_wave) break;
 
-
-			KLog("--- Enemy Wave Data ---");
-			KLog_U1("Wave Manager Cursor:", wave_manager_cursor);
-			KLog_U1("Current Wave:", wave_manager_current_wave);
-			KLog_U1("Wave:", data->wave);
-			KLog_U1("Type:", data->type);
-			KLog_U2("Position X:", data->x % VIRTUAL_SCREEN_W, "Position Y:", data->y);
-			KLog_U1("Behavior:", data->behavior);
-
-
-            if (data->wave != wave_manager_current_wave) {
-                break; // Chegamos ao fim dos inimigos desta horda
+            // Guarda os dados do primeiro inimigo para pegar o 'behavior'
+            if (member_count == 0) {
+                first_enemy_data = data;
             }
 
-            ENEMY_spawn(data->type, data->x, data->y, &ind);
+            // Spawna o inimigo e guarda o ponteiro no nosso array temporário
+            if (member_count < MAX_ENEMIES_PER_FORMATION) {
+                new_members[member_count] = ENEMY_spawn(data->type, data->x, data->y, &ind);
+                if (new_members[member_count] != NULL) {
+                    member_count++;
+                }
+            }
+            
             wave_manager_cursor++;
-            spawned_this_frame = TRUE;
         }
 
-        // Se spawnamos inimigos, preparamos para a próxima horda
-        if (spawned_this_frame) {
+        // Se criamos inimigos, agora os agrupamos em uma formação
+        if (member_count > 0) {
+            WaveDef temp_wave_def;
+            temp_wave_def.num_enemies = member_count;
+            // 'first_enemy_data' contém o 'behavior' da horda
+            FORMATION_create(new_members, member_count, first_enemy_data);
+            
             wave_manager_current_wave++;
         }
     }
 }
 
+void read_wave_data() {
+	for (u8 i = 0; i < LEN(waves1); ++i) {
+		const WaveObjectData* data = waves1[i];
+		kprintf("%d, %d, %ld, %d", data->wave, data->type, data->x, data->y - 224);
+
+		// kprintf("%ld, %ld", F32_toInt(data->x) % 640 - 160, F32_toInt(data->y) -7 * 16);
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // GAME INIT
@@ -150,7 +158,7 @@ void game_init() {
 	VDP_setScreenWidth320();
 	ENEMY_init_system();
 
-	wave_size  = (sizeof(waves1) / sizeof(waves1[0]));
+	wave_size  = LEN(waves1);
 	KLog_U1("Tamanho do array de ondas:", wave_size);
 
 	// init BACKGROUND, LEVEL AND HUD ///////////////////////////////
@@ -183,6 +191,7 @@ void game_init() {
 	KLog_U1("VRAM apos PLAYER_init (jogador + tiros):", ind);
 }
 
+
 ////////////////////////////////////////////////////////////////////////////
 // GAME LOGIC
 
@@ -210,6 +219,7 @@ void game_init() {
 
 static inline void game_update() {
 	handle_waves();
+	// read_wave_data();
 	KLog_U1("Inimigos ativos contados pelo sistema:", ENEMY_get_active_count());
 	update_input();
 	PLAYER_update();
@@ -236,7 +246,7 @@ int main(bool resetType) {
 	if (!resetType) {
 		SYS_hardReset();
 	}
-	SYS_showFrameLoad(TRUE);
+	// SYS_showFrameLoad(FALSE);
 	game_init();
 
 	SYS_doVBlankProcess();

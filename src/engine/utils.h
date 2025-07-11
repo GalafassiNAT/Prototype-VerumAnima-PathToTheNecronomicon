@@ -12,6 +12,8 @@ extern u8 buttons_old[NUMBER_OF_JOYPADS];
 
 extern char line[MAX_TEXT_LINE];
 
+#define LEN(VEC) sizeof(VEC)/sizeof(VEC[0])
+
 ////////////////////////////////////////////////////////////////////////////
 // LOGIC
 

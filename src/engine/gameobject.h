@@ -15,8 +15,8 @@ typedef struct {
 
 typedef struct {
 	Sprite* sprite;
-	f16 x;
-	f16 y;
+	s16 x;
+	s16 y;
 	u8 anim;
 
 	f16 next_x;

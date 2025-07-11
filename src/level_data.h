@@ -18,9 +18,9 @@ typedef enum {
 
 
 typedef struct {
-	f32 x;
-	f32 y;
-
+	s16 x;
+	s16 y;
+	
 	u8 wave;
 	u8 type;
 	u8 behavior;

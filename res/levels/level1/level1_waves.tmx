@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="120" height="32" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="44">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="120" height="32" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="45">
  <layer id="1" name="Tile Layer 1" width="120" height="32">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -37,7 +37,7 @@
 </data>
  </layer>
  <objectgroup id="2" name="obj_layer">
-  <object id="3" x="240.333" y="176" width="16" height="16">
+  <object id="3" x="240.027" y="176.02" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="0"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -45,7 +45,7 @@
     <property name="wave" type="int" value="1"/>
    </properties>
   </object>
-  <object id="5" x="240.667" y="144.333" width="16" height="16">
+  <object id="5" x="240.003" y="144.005" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="0"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -53,7 +53,7 @@
     <property name="wave" type="int" value="1"/>
    </properties>
   </object>
-  <object id="6" x="288.667" y="160" width="16" height="16">
+  <object id="6" x="288.026" y="160.016" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="0"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -61,7 +61,7 @@
     <property name="wave" type="int" value="1"/>
    </properties>
   </object>
-  <object id="7" x="288" y="128.333" width="16" height="16">
+  <object id="7" x="288.008" y="128.001" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="0"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -77,7 +77,7 @@
     <property name="wave" type="int" value="1"/>
    </properties>
   </object>
-  <object id="9" x="848.833" y="336.834" width="16" height="16">
+  <object id="9" x="848" y="336" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -85,7 +85,7 @@
     <property name="wave" type="int" value="2"/>
    </properties>
   </object>
-  <object id="10" x="848.167" y="304.167" width="16" height="16">
+  <object id="10" x="848" y="304" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -93,7 +93,7 @@
     <property name="wave" type="int" value="2"/>
    </properties>
   </object>
-  <object id="11" x="897.167" y="320.834" width="16" height="16">
+  <object id="11" x="896" y="320" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -101,7 +101,7 @@
     <property name="wave" type="int" value="2"/>
    </properties>
   </object>
-  <object id="12" x="896.5" y="289.167" width="16" height="16">
+  <object id="12" x="896" y="288" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -109,7 +109,7 @@
     <property name="wave" type="int" value="2"/>
    </properties>
   </object>
-  <object id="13" x="896.5" y="352.834" width="16" height="16">
+  <object id="13" x="896" y="352" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -133,7 +133,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="16" x="1199" y="193" width="16" height="16">
+  <object id="16" x="1200" y="192" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -141,7 +141,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="17" x="1216" y="161" width="16" height="16">
+  <object id="17" x="1216" y="160" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="0"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -157,7 +157,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="19" x="1199" y="96" width="16" height="16">
+  <object id="19" x="1200" y="96" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -173,7 +173,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="21" x="1296.75" y="319.834" width="16" height="16">
+  <object id="21" x="1296" y="320" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -181,7 +181,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="22" x="1296.08" y="353.166" width="16" height="16">
+  <object id="22" x="1296" y="352" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -189,7 +189,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="23" x="1328.58" y="336.334" width="16" height="16">
+  <object id="23" x="1328" y="336" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -197,7 +197,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="24" x="1327.92" y="303.666" width="16" height="16">
+  <object id="24" x="1328" y="304" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -205,7 +205,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="25" x="1359.92" y="336.334" width="16" height="16">
+  <object id="25" x="1360" y="336" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -213,7 +213,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="26" x="1295.92" y="289" width="16" height="16">
+  <object id="26" x="1296" y="288" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -221,7 +221,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="27" x="1360.5" y="304.5" width="16" height="16">
+  <object id="27" x="1360" y="304" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="2"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -229,7 +229,7 @@
     <property name="wave" type="int" value="3"/>
    </properties>
   </object>
-  <object id="34" x="1743.5" y="192.5" width="16" height="16">
+  <object id="34" x="1744" y="192" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -237,7 +237,7 @@
     <property name="wave" type="int" value="4"/>
    </properties>
   </object>
-  <object id="35" x="1711.5" y="192.5" width="16" height="16">
+  <object id="35" x="1712" y="192" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -245,7 +245,7 @@
     <property name="wave" type="int" value="4"/>
    </properties>
   </object>
-  <object id="36" x="1678.83" y="159.833" width="16" height="16">
+  <object id="36" x="1680" y="160" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="0"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -253,7 +253,7 @@
     <property name="wave" type="int" value="4"/>
    </properties>
   </object>
-  <object id="37" x="1679.5" y="128.833" width="16" height="16">
+  <object id="37" x="1680" y="128" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="0"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -261,7 +261,7 @@
     <property name="wave" type="int" value="4"/>
    </properties>
   </object>
-  <object id="38" x="1711.17" y="96.5" width="16" height="16">
+  <object id="38" x="1712" y="96" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -269,7 +269,7 @@
     <property name="wave" type="int" value="4"/>
    </properties>
   </object>
-  <object id="39" x="1743.5" y="96.5" width="16" height="16">
+  <object id="39" x="1744" y="96" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -277,7 +277,7 @@
     <property name="wave" type="int" value="4"/>
    </properties>
   </object>
-  <object id="40" x="1647.83" y="192.667" width="16" height="16">
+  <object id="40" x="1648" y="192" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -285,7 +285,7 @@
     <property name="wave" type="int" value="4"/>
    </properties>
   </object>
-  <object id="41" x="1615.83" y="192.667" width="16" height="16">
+  <object id="41" x="1616" y="192" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -293,7 +293,7 @@
     <property name="wave" type="int" value="4"/>
    </properties>
   </object>
-  <object id="42" x="1615.5" y="96.6667" width="16" height="16">
+  <object id="42" x="1616" y="96" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>
@@ -301,7 +301,7 @@
     <property name="wave" type="int" value="4"/>
    </properties>
   </object>
-  <object id="43" x="1647.83" y="96.6667" width="16" height="16">
+  <object id="43" x="1648" y="96" width="16" height="16">
    <properties>
     <property name="behavior" type="int" value="1"/>
     <property name="exportPosition" type="bool" value="true"/>

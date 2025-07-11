@@ -28,6 +28,7 @@ GameObject* ENEMY_spawn_bat(s16 x, s16 y, u16 *current_vram_tile_index);
 GameObject* ENEMY_spawn_crow(s16 x, s16 y, u16 *current_vram_tile_index);
 GameObject* ENEMY_spawn_minieye(s16 x, s16 y, u16 *current_vram_tile_index);
 GameObject* ENEMY_spawn(EnemyType type, s16 x, s16 y, u16* vram_index);
+void FORMATION_create(GameObject* members[], u16 num_members, const WaveObjectData* wave_data);
 u8 ENEMY_get_active_count();
 void ENEMY_update_all();
 

@@ -2,6 +2,7 @@
 #include "globals.h"
 #include "resources.h"
 #include "player.h"
+#include "level_data.h"
 
 static GameObject enemy_object_array[MAX_ENEMIES];
 static GameObject_node enemy_node_array[MAX_ENEMIES];
@@ -20,7 +21,7 @@ void ENEMY_init_system(){
 GameObject* ENEMY_spawn_bat(s16 x, s16 y, u16* current_vram_tile_index) {
 
     // Use KLog_U2 para dois inteiros sem sinal
-    KLog_U2("ENEMY_spawn_bat: x=", x, "y=", y);
+    kprintf("BAT - Position X: %d, Position Y: %d", x, y);
     // E uma segunda chamada para o ponteiro se necessário
     KLog("current_vram_tile_index pointer address");
 
@@ -36,7 +37,7 @@ GameObject* ENEMY_spawn_bat(s16 x, s16 y, u16* current_vram_tile_index) {
         return NULL;
     }
 
-    if (&spr_bat == NULL || spr_bat.maxNumTile == 0) {
+    if (spr_bat.maxNumTile == 0) {
         KLog("ERRO CRITICO: O recurso 'spr_bat' parece invalido ou nao tem tiles!");
         GAMEOBJECT_pool_free(&enemy_pool, new_bat);
         return NULL;
@@ -70,7 +71,7 @@ GameObject *ENEMY_spawn_crow(s16 x, s16 y, u16* current_vram_tile_index) {
         return NULL;
     }
 
-    if (&spr_crow == NULL || spr_crow.maxNumTile == 0) {
+    if (spr_crow.maxNumTile == 0) {
         KLog("ERRO CRITICO: O recurso 'spr_crow' parece invalido ou nao tem tiles!");
         GAMEOBJECT_pool_free(&enemy_pool, new_crow);
         return NULL;
@@ -102,7 +103,7 @@ GameObject *ENEMY_spawn_minieye(s16 x, s16 y, u16 *current_vram_tile_index){
         return NULL;
     }
 
-    if (&spr_eye == NULL || spr_eye.maxNumTile == 0) {
+    if (spr_eye.maxNumTile == 0) {
         KLog("ERRO CRITICO: O recurso 'spr_eye' parece invalido ou nao tem tiles!");
         GAMEOBJECT_pool_free(&enemy_pool, new_minieye);
         return NULL;
@@ -126,14 +127,16 @@ GameObject *ENEMY_spawn(EnemyType type, s16 tiled_x, s16 tiled_y, u16 *vram_inde
 {
 
 	s16 x = tiled_x % VIRTUAL_SCREEN_W;
+    s16 y = tiled_y - 224;
+
 
     switch (type) {
         case ENEMY_TYPE_BAT:
-            return ENEMY_spawn_bat(x, tiled_y, vram_index);
+            return ENEMY_spawn_bat(x, y, vram_index);
         case ENEMY_TYPE_CROW:
-            return ENEMY_spawn_crow(x, tiled_y, vram_index);
+            return ENEMY_spawn_crow(x, y, vram_index);
         case ENEMY_TYPE_MINIEYE:
-            return ENEMY_spawn_minieye(x, tiled_y, vram_index);
+            return ENEMY_spawn_minieye(x, y, vram_index);
         case ENEMY_TYPE_MINIBOSS:
             break;
         case ENEMY_TYPE_BOSS:
@@ -160,152 +163,149 @@ u8 ENEMY_get_active_count(){
 }
 
 // Em src/enemy.c
+void ENEMY_update_all() {
+    // Itera sobre as FORMAÇÕES ativas
+    for (u8 f = 0; f < active_formations_count; f++) {
+        Formation* form = &formation_storage[f];
+
+    switch (form->behavior) {
+            case AI_BEHAVIOR_VERTICAL_BOUNCE: {
+                s16 min_y = 300;
+                s16 max_y = -100;
+                u8 live_members = 0; // Começa o contador
+
+                // Calcula a hitbox geral da formação
+                for (u8 i = 0; i < form->num_members; i++) {
+                    GameObject* member = form->members[i];
+                    if (member->health > 0) {
+                        live_members++; // CORREÇÃO: Incrementa o contador
+                        s16 top_y = F16_toInt(member->y); // CORREÇÃO: Nome da função
+                        s16 bottom_y = top_y + member->h;
+                        if (top_y < min_y) min_y = top_y;
+                        if (bottom_y > max_y) max_y = bottom_y;
+                    }
+                }
+
+                // Se não há mais membros vivos, podemos pular esta formação
+                if (live_members == 0) {
+                    // TODO: Lógica para remover a formação aqui
+                    continue; 
+                }
+
+                form->box.top = min_y;
+                form->box.bottom = max_y;
+
+                // Máquina de estados da formação
+                if (form->ai_state == 0) { // "Entrando"
+                    if (form->box.top >= 0) form->ai_state = 1; // "Patrulhando"
+                } else { // "Patrulhando"
+                    // Lógica de "bate e volta" que você já tinha
+                    if (form->box.top <= 0 && form->speed_y < 0) {
+                        form->speed_y = -form->speed_y;
+                    } else if (form->box.bottom >= SCREEN_H && form->speed_y > 0) {
+                        form->speed_y = -form->speed_y;
+                    }
+                }
+                break;
+            }
+            // ... outros comportamentos ...
+        }
+
+        // --- 2. ATUALIZA CADA MEMBRO DA FORMAÇÃO ---
+        for (u8 i = 0; i < form->num_members; i++) {
+            GameObject* enemy = form->members[i];
+
+            if (enemy->health > 0) {
+                // A. Aplica o movimento da formação ao inimigo
+                if (form->behavior == AI_BEHAVIOR_VERTICAL_BOUNCE) {
+                    enemy->y += form->speed_y;
+                } else if (form->behavior == AI_BEHAVIOR_FLY_STRAIGHT) {
+                    enemy->x += enemy->speed_x;
+                }
+
+                // B. CORREÇÃO CRÍTICA: Atualiza a hitbox com a nova posição
+                GAMEOBJECT_update_boundbox(enemy->x, enemy->y, enemy);
+
+                // C. Checa colisão com os tiros do jogador
+                GameObject_node* bullet_node = PLAYER_get_active_bullets_list();
+                while (bullet_node != NULL) {
+                    GameObject* bullet = bullet_node->g_object;
+
+                    if (GAMEOBJECT_check_collision(enemy, bullet)) {
+                        enemy->health -= PLAYER_bullet_dmg;
+                        // O inimigo "mata" o tiro ao zerar a vida dele.
+                        // O sistema do jogador em PLAYER_update_bullets se encarregará de liberá-lo.
+                        bullet->health = 0;
+                        break; // Tiro foi consumido, sai do loop de balas
+                    }
+                    bullet_node = bullet_node->next;
+                }
+
+                // D. Checa se o inimigo morreu e atualiza o sprite
+                if (enemy->health <= 0) {
+                    SPR_setVisibility(enemy->sprite, HIDDEN);
+                    // TODO: Drop de itens aqui
+                } else {
+                    // Esta chamada agora usará a hitbox correta e moverá o sprite!
+                    SPR_setPosition(enemy->sprite, enemy->box.left + enemy->w_offset, enemy->box.top + enemy->h_offset);
+                }
+            }
+        }
+        // TODO: Lógica para remover a formação quando todos os membros morrerem
+    }
+}
+
+
+// Em src/enemy.c
 // void ENEMY_update_all() {
-//     // Itera sobre as FORMAÇÕES ativas
-//     for (u8 f = 0; f < active_formations_count; f++) {
-//         Formation* form = &formation_storage[f];
+//     // Pega o primeiro nó da lista de inimigos ativos da nossa pool
+//     GameObject_node* current_node = enemy_pool.active_h;
+//     u8 update_counter = 0; // Nosso contador para este quadro
+//     // KLog("Iniciando ENEMY_update_all..."); // Log para ver se a função é chamada
 
-//         // --- 1. ATUALIZA A LÓGICA DA FORMAÇÃO ---
-//         switch (form->behavior) {
-//             case AI_BEHAVIOR_VERTICAL_BOUNCE: {
-//                 // (Sua lógica aqui para calcular a hitbox geral da formação e
-//                 // inverter a 'form->speed_y' quando ela atinge as bordas está ótima!)
-//                 s16 min_y = 300;
-//                 s16 max_y = -100;
-//                 // ...
-//                 for(u8 i = 0; i < form->num_members; i++) {
-//                     GameObject* member = form->members[i];
-//                     if(member->health > 0) {
-//                         s16 top_y = F16_toInt(member->y);
-//                         s16 bottom_y = top_y + member->h;
-//                         if (top_y < min_y) min_y = top_y;
-//                         if (bottom_y > max_y) max_y = bottom_y;
-//                     }
-//                 }
-//                 form->box.top = min_y;
-//                 form->box.bottom = max_y;
+//     // Percorre a lista encadeada de TODOS os GameObjects ativos
+//     while (current_node != NULL) {
+//         update_counter++;
+//         GameObject* enemy = current_node->g_object;
 
-//                 if (form->ai_state == 0) {
-//                     if (form->box.top >= 0) form->ai_state = 1; // Começa a patrulhar
-//                 } else {
-//                     if (form->box.top <= 0 && form->speed_y < 0) {
-//                         form->speed_y = -form->speed_y;
-//                     } else if (form->box.bottom >= SCREEN_H && form->speed_y > 0) {
-//                         form->speed_y = -form->speed_y;
-//                     }
-//                 }
-//                 break;
-//             }
-//             // ... outros comportamentos
-//         }
+//         // --- TESTE: MOVIMENTO INCONDICIONAL PARA BAIXO ---
+        
+//         // Ignoramos formações, comportamentos e estados.
+//         // Apenas adicionamos uma velocidade vertical constante.
+//         enemy->y += FIX16(1.0); // Move 1 pixel para baixo por quadro
 
-//         // --- 2. ATUALIZA CADA MEMBRO DA FORMAÇÃO ---
-//         for (u8 i = 0; i < form->num_members; i++) {
-//             GameObject* enemy = form->members[i];
+//         // Atualizamos a hitbox com a nova posição lógica
+//         GAMEOBJECT_update_boundbox(enemy->x, enemy->y, enemy);
 
-//             if (enemy->health > 0) {
-//                 // A. Aplica o movimento da formação ao inimigo
-//                 if (form->behavior == AI_BEHAVIOR_VERTICAL_BOUNCE) {
-//                     enemy->y += form->speed_y;
-//                 } else if (form->behavior == AI_BEHAVIOR_FLY_STRAIGHT) {
-//                     enemy->x += enemy->speed_x;
-//                 }
-
-//                 // B. CORREÇÃO CRÍTICA: Atualiza a hitbox com a nova posição
-//                 GAMEOBJECT_update_boundbox(enemy->x, enemy->y, enemy);
-
-//                 // C. Checa colisão com os tiros do jogador
-//                 GameObject_node* bullet_node = PLAYER_get_active_bullets_list();
-//                 while (bullet_node != NULL) {
-//                     GameObject* bullet = bullet_node->g_object;
-
-//                     if (GAMEOBJECT_check_collision(enemy, bullet)) {
-//                         enemy->health -= PLAYER_bullet_dmg;
-//                         // O inimigo "mata" o tiro ao zerar a vida dele.
-//                         // O sistema do jogador em PLAYER_update_bullets se encarregará de liberá-lo.
-//                         bullet->health = 0;
-//                         break; // Tiro foi consumido, sai do loop de balas
-//                     }
-//                     bullet_node = bullet_node->next;
-//                 }
-
-//                 // D. Checa se o inimigo morreu e atualiza o sprite
-//                 if (enemy->health <= 0) {
-//                     SPR_setVisibility(enemy->sprite, HIDDEN);
-//                     // TODO: Drop de itens aqui
-//                 } else {
-//                     // Esta chamada agora usará a hitbox correta e moverá o sprite!
-//                     SPR_setPosition(enemy->sprite, enemy->box.left + enemy->w_offset, enemy->box.top + enemy->h_offset);
-//                 }
-//             }
-//         }
-//         // TODO: Lógica para remover a formação quando todos os membros morrerem
+//         // E atualizamos a posição do sprite na tela
+//         SPR_setPosition(enemy->sprite, enemy->box.left + enemy->w_offset, enemy->box.top + enemy->h_offset);
+        
+//         // Avançamos para o próximo inimigo na lista
+//         current_node = current_node->next;
 //     }
+//     KLog_U1("Inimigos realmente atualizados neste quadro:", update_counter);
 // }
 
 
 // Em src/enemy.c
-void ENEMY_update_all() {
-    // Pega o primeiro nó da lista de inimigos ativos da nossa pool
-    GameObject_node* current_node = enemy_pool.active_h;
-    u8 update_counter = 0; // Nosso contador para este quadro
-    // KLog("Iniciando ENEMY_update_all..."); // Log para ver se a função é chamada
 
-    // Percorre a lista encadeada de TODOS os GameObjects ativos
-    while (current_node != NULL) {
-        update_counter++;
-        GameObject* enemy = current_node->g_object;
-
-        // --- TESTE: MOVIMENTO INCONDICIONAL PARA BAIXO ---
-        
-        // Ignoramos formações, comportamentos e estados.
-        // Apenas adicionamos uma velocidade vertical constante.
-        enemy->y += FIX16(1.0); // Move 1 pixel para baixo por quadro
-
-        // Atualizamos a hitbox com a nova posição lógica
-        GAMEOBJECT_update_boundbox(enemy->x, enemy->y, enemy);
-
-        // E atualizamos a posição do sprite na tela
-        SPR_setPosition(enemy->sprite, enemy->box.left + enemy->w_offset, enemy->box.top + enemy->h_offset);
-        
-        // Avançamos para o próximo inimigo na lista
-        current_node = current_node->next;
-    }
-    KLog_U1("Inimigos realmente atualizados neste quadro:", update_counter);
-}
-
-
-void FORMATION_create(const WaveDef* wave_def, u16* idx) {
-    if (active_formations_count >= MAX_ACTIVE_FORMATIONS) {
-        return;
-    }
+// Esta função recebe um array de ponteiros para GameObjects e os agrupa.
+void FORMATION_create(GameObject* members[], u16 num_members, const WaveObjectData* wave_data) {
+    if (active_formations_count >= MAX_ACTIVE_FORMATIONS) return;
 
     Formation* new_formation = &formation_storage[active_formations_count];
-    new_formation->num_members = 0;
+    new_formation->num_members = num_members;
 
-    u16 enemies_to_spawn = wave_def->num_enemies;
-    if (enemies_to_spawn > MAX_ENEMIES_PER_FORMATION) {
-        enemies_to_spawn = MAX_ENEMIES_PER_FORMATION;
+    // Copia os ponteiros dos membros para a struct da formação
+    for (u16 i = 0; i < num_members; i++) {
+        new_formation->members[i] = members[i];
     }
 
-    for (u16 i = 0; i < enemies_to_spawn; i++) {
-        const WaveObjectData* enemy_data = &wave_def->enemies[i];
-
-        if (new_formation->members[i]->y > FIX16(-50)) {
-            new_formation->members[i]->y = FIX16(-50);
-        }
-
-        GameObject* new_enemy = ENEMY_spawn(enemy_data->type, enemy_data->x, enemy_data->y, idx);
-
-        if (new_enemy != NULL) {
-            new_formation->members[new_formation->num_members++] = new_enemy;
-        }
-    }
-
-    if (new_formation->num_members > 0) {
-        new_formation->behavior = (AIBehaviorType)wave_def->enemies[0].behavior;
-        new_formation->ai_state = 0;
-        new_formation->speed_y = FIX16(1.6);
-        active_formations_count++;
-    }
+    // Configura o estado inicial da FORMAÇÃO
+    new_formation->behavior = (AIBehaviorType)wave_data->behavior;
+    new_formation->ai_state = 0; // Estado: Entrando na tela
+    new_formation->speed_y = FIX16(1.0); // Velocidade inicial para baixo
+    
+    active_formations_count++;
+    KLog_U1("Formacao criada com behavior:", new_formation->behavior);
 }
