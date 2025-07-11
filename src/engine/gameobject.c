@@ -17,6 +17,8 @@ u16 GAMEOBJECT_init(GameObject* const obj, const SpriteDefinition* const sprite,
 	
 	obj->sprite = SPR_addSprite(sprite, x, y, TILE_ATTR_FULL(pal, FALSE, FALSE, 0, ind));
 
+	KLog_S2("GAMEOBJECT_init: Sprite alocado em VRAM tile idx=", ind, ", usando tiles=", sprite->maxNumTile);
+
 	obj->w = obj->sprite->definition->w + w_offset;
 	obj->h = obj->sprite->definition->h + h_offset;
 	obj->w_offset = w_offset/2; // half offset for each side

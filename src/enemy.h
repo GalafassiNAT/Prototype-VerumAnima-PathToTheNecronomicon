@@ -7,8 +7,8 @@
 #include "level_data.h"
 
 
-#define MAX_ENEMIES 15
-#define MAX_ENEMIES_PER_FORMATION 8
+#define MAX_ENEMIES 36
+#define MAX_ENEMIES_PER_FORMATION 20
 
 typedef struct {
 	AIBehaviorType behavior;

@@ -9,7 +9,9 @@
 GameObject player;
 
 // Bullet system
-GameObject player_bullets[MAX_PLAYER_BULLETS];
+static GameObject player_bullet_storage[MAX_PLAYER_BULLETS];
+static GameObject_node player_bullet_nodes[MAX_PLAYER_BULLETS];
+static GameObject_Pool player_bullet_pool;
 u8 PLAYER_bullet_dmg = 5;
 #define BULLET_SPEED FIX16(4)
 
@@ -33,33 +35,61 @@ static inline bool on_ground();
 ////////////////////////////////////////////////////////////////////////////
 // INIT
 
+// Em src/player.c
+// Em src/player.c
+// Em src/player.c
+
 u16 PLAYER_init(u16 ind) {
-	ind += GAMEOBJECT_init(&player, &spr_plat, SCREEN_W/2-12, SCREEN_H/2-12, -16, -16, PAL_PLAYER, ind);
-	player.mana = 0;
-	player.health = PLAYER_MAX_HEALTH;
+    // Guarda o índice de VRAM inicial para podermos calcular o total usado
+    u16 initial_vram_index = ind;
 
-	u16 bullet_color = RGB24_TO_VDPCOLOR(0xE00000); // red
+    // --- Inicializa o Jogador ---
+    // GAMEOBJECT_init retorna os tiles usados pelo sprite do jogador
+    u16 player_tiles = GAMEOBJECT_init(&player, &spr_plat, SCREEN_W/2 - 12, SCREEN_H/2 - 12, -16, -16, PAL_PLAYER, ind);
+    ind += player_tiles; // Atualiza o 'ind' com os tiles do jogador
 
-	PAL_setColor(PAL_MAP * 16 + 1, bullet_color);
+    player.mana = 0;
+    player.health = PLAYER_MAX_HEALTH;
 
-	for (u8 i = 0; i < MAX_PLAYER_BULLETS; i++) {
-		player_bullets[i].health = 0; // not active
+    // --- Inicializa os Tiros do Jogador ---
+    u16 bullet_color = RGB24_TO_VDPCOLOR(0xE00000); // Vermelho
+    PAL_setColor(PAL_MAP * 16 + 1, bullet_color);
 
-		u16 bullet_sprite_tiles = GAMEOBJECT_init(&player_bullets[i], &spr_player_shot, -64,-64, 0,0, PAL_MAP, ind);
-		ind += bullet_sprite_tiles;
-		SPR_setVisibility(player_bullets[i].sprite, HIDDEN);
-		SPR_setAnimAndFrame(player_bullets[i].sprite, 0, 0); // default animation
-		SPR_setAnimationLoop(player_bullets[i].sprite, FALSE);
+    // Inicializa a pool de tiros
+    GAMEOBJECT_pool_init(&player_bullet_pool, player_bullet_storage, player_bullet_nodes, MAX_PLAYER_BULLETS);
 
-	}
+    // Contabiliza os tiles para a DEFINIÇÃO do sprite do tiro APENAS UMA VEZ
+    if (MAX_PLAYER_BULLETS > 0) {
+        // Esta é a única vez que incrementamos 'ind' para os tiros.
+        ind += spr_player_shot.maxNumTile;
+    }
 
-	return ind;
+    // Pré-cria os sprites para todos os tiros na pool.
+    // O SGDK é esperto e irá reutilizar os tiles já carregados.
+    for (u8 i = 0; i < MAX_PLAYER_BULLETS; i++) {
+        GameObject* bullet = &player_bullet_storage[i];
+        
+        // O índice de VRAM passado aqui é um "hint". Como os tiles já foram
+        // "contabilizados", o SGDK vai apenas usar os que já estão na VRAM.
+        // Passamos o início de onde os tiles do tiro foram carregados.
+        GAMEOBJECT_init(bullet, &spr_player_shot, -64, -64, 0, 0, PAL_MAP, (initial_vram_index + player_tiles));
+
+        SPR_setAnimAndFrame(bullet->sprite, 0, 0);
+        SPR_setAnimationLoop(bullet->sprite, FALSE);
+    }
+
+    // Retorna o NÚMERO TOTAL de tiles que esta função realmente consumiu
+    return (ind - initial_vram_index);
 }
-
 ////////////////////////////////////////////////////////////////////////////
 // UPDATE
 
-void PLAYER_update() {
+GameObject_node *PLAYER_get_active_bullets_list() {
+	return player_bullet_pool.active_h;
+}
+
+void PLAYER_update()
+{
 	// input
 	// PLAYER_get_input_dir4();
 	PLAYER_get_input_dir8();
@@ -95,7 +125,6 @@ void PLAYER_update() {
 	GAMEOBJECT_update_boundbox(player.x, player.y, &player);
 	SPR_setPosition(player.sprite, player.box.left + player.w_offset, player.box.top + player.h_offset);
 	SPR_setAnim(player.sprite, player.anim);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -103,57 +132,56 @@ void PLAYER_update() {
 void PLAYER_shoot() {
 	if (key_pressed(JOY_1, BUTTON_A)) {
 
-		for (u8 i = 0; i < MAX_PLAYER_BULLETS; i++) {
-			if (player_bullets[i].health == 0) {
-				GameObject *bullet = &player_bullets[i];
-				bullet->health = 1; // active
-				
-				bullet->y = player.y + FIX16(player.h/2) - FIX16(bullet->h/2);
-				bullet->speed_y = 0;
-	
-				bullet->x = player.x + FIX16(player.w);
-	
-				bullet->speed_x = BULLET_SPEED;
-				bullet->speed_y = 0;
-	
-				SPR_setHFlip(bullet->sprite, FALSE); // default right
-				GAMEOBJECT_update_boundbox(bullet->x, bullet->y, bullet);
-				SPR_setPosition(bullet->sprite, bullet->box.left + bullet->w_offset, bullet->box.top + bullet->h_offset);
-				SPR_setVisibility(bullet->sprite, VISIBLE);
-				SPR_setAnimAndFrame(bullet->sprite, 0, 0); // default animation
-	
-				return;
-			}
+		GameObject* bullet = GAMEOBJECT_pool_alloc(&player_bullet_pool);
+
+		if (bullet != NULL) {
+			bullet->health = 1; // active
+			
+			bullet->y = player.y + FIX16(player.h/2) - FIX16(bullet->h/2);
+			bullet->speed_y = 0;
+
+			bullet->x = player.x + FIX16(player.w);
+
+			bullet->speed_x = BULLET_SPEED;
+			bullet->speed_y = 0;
+
+			SPR_setHFlip(bullet->sprite, FALSE); // default right
+			GAMEOBJECT_update_boundbox(bullet->x, bullet->y, bullet);
+			SPR_setPosition(bullet->sprite, bullet->box.left + bullet->w_offset, bullet->box.top + bullet->h_offset);
+			SPR_setVisibility(bullet->sprite, VISIBLE);
+			SPR_setAnimAndFrame(bullet->sprite, 0, 0); // default animation
+
+			return;
 		}
+		
 	}
 }
 
 
 void PLAYER_update_bullets() {
-	for (u8 i = 0; i < MAX_PLAYER_BULLETS; i++) {
-		GameObject *bullet = &player_bullets[i];
-		if (bullet->health > 0) {
-			bullet->x += bullet->speed_x;
+	GameObject_node* current = player_bullet_pool.active_h;
 
-			GAMEOBJECT_update_boundbox(bullet->x, bullet->y, bullet);
-			SPR_setPosition(bullet->sprite, bullet->box.left + bullet->w_offset, bullet->box.top + bullet->h_offset);
 
-			if (bullet->box.right < 0 || bullet->box.left > SCREEN_W ||
-				bullet->box.bottom < 0 || bullet->box.top > SCREEN_H) {
-				// out of screen
-				bullet->health = 0;
-				SPR_setVisibility(bullet->sprite, HIDDEN);
-			} else {
-				// check collision with level map
-				u8 collision = LEVEL_collision_result();
-				if (collision & COLLISION_LEFT || collision & COLLISION_RIGHT ||
-					collision & COLLISION_TOP || collision & COLLISION_BOTTOM) {
-					// hit a wall
-					bullet->health = 0;
-					SPR_setVisibility(bullet->sprite, HIDDEN);
-				}
-			}
-		}
+	while (current != NULL) {
+
+		GameObject* bullet = current->g_object;
+		GameObject_node* next = current->next;
+
+		bullet->x += bullet->speed_x;
+		
+		GAMEOBJECT_update_boundbox(bullet->x, bullet->y, bullet);
+		SPR_setPosition(bullet->sprite, bullet->box.left + bullet->w_offset, bullet->box.top + bullet->h_offset);
+
+		bool should_be_freed = FALSE;
+		if (bullet->box.left > SCREEN_W) { 
+            should_be_freed = TRUE;
+        } 
+
+		if (should_be_freed) {
+            GAMEOBJECT_pool_free(&player_bullet_pool, bullet);
+        }
+
+		current = next;
 	}
 }
 

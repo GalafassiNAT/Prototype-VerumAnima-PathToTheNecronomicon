@@ -9,7 +9,7 @@
 #define ANIM_HORIZONTAL  1
 
 #define MAX_PLAYER_BULLETS 8
-extern GameObject player_bullets[MAX_PLAYER_BULLETS];
+
 extern u8 PLAYER_bullet_dmg;
 
 
@@ -24,7 +24,11 @@ u16 PLAYER_init(u16 ind);
 
 ////////////////////////////////////////////////////////////////////////////
 // GAME LOOP/LOGIC
-
+/**
+ * @brief Retorna um ponteiro para o início da lista de tiros ativos do jogador.
+ * * @return GameObject_node* O primeiro nó da lista, ou NULL se não houver tiros ativos.
+ */
+GameObject_node* PLAYER_get_active_bullets_list();
 void PLAYER_update();
 void PLAYER_shoot();
 void PLAYER_update_bullets();

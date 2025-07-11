@@ -48,7 +48,7 @@
 #define PLAYER_SPEED   FIX16(2)
 #define PLAYER_SPEED45 FIX16(0.707 * 2)
 
-#define PLAYER_MAX_HEALTH 10
+#define PLAYER_MAX_HEALTH 15
 
 
 /*** ATENTION: DO NOT YOU MUST MODIFYT *********************************

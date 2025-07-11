@@ -12,5 +12,5 @@ SPRITE  spr_eye 		  "sprites/enemy_eye.png"    2 2 FAST 5
 
 SPRITE  spr_player_shot   "sprites/player_shots.png" 2 2 FAST 0
 
-OBJECTS waves1 "levels/level1/level1_waves.tmx" obj_layer "wave:u8;type:u8;behavior:u8;X:s16;Y:s16" "sortby:wave"
+OBJECTS waves1 "levels/level1/level1_waves.tmx" obj_layer "x:f32;y:f32;wave:u8;type:u8;behavior:u8;" "sortby:wave"
 
