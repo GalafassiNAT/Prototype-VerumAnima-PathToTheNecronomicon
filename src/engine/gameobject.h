@@ -31,10 +31,12 @@ typedef struct {
 
 	s8 health;
 	u8 mana;
+
+	
 	EnemyType type;
 
 	u8 ai_state;
-
+	AIBehaviorType behavior;
 	u16 ai_timer;
 	f16 target_y;
 	f16 offset_x_from_anchor;

@@ -108,7 +108,7 @@ static void handle_waves() {
 
             // Spawna o inimigo e guarda o ponteiro no nosso array temporário
             if (member_count < MAX_ENEMIES_PER_FORMATION) {
-                new_members[member_count] = ENEMY_spawn(data->type, data->x, data->y, &ind);
+                new_members[member_count] = ENEMY_spawn(data->type, data->x, data->y, (AIBehaviorType)data->behavior, &ind);
                 if (new_members[member_count] != NULL) {
                     member_count++;
                 }
@@ -117,11 +117,10 @@ static void handle_waves() {
             wave_manager_cursor++;
         }
 
-        // Se criamos inimigos, agora os agrupamos em uma formação
+		// Se houver membros na formação, cria a formação
         if (member_count > 0) {
             WaveDef temp_wave_def;
             temp_wave_def.num_enemies = member_count;
-            // 'first_enemy_data' contém o 'behavior' da horda
             FORMATION_create(new_members, member_count, first_enemy_data);
             
             wave_manager_current_wave++;
@@ -195,27 +194,6 @@ void game_init() {
 ////////////////////////////////////////////////////////////////////////////
 // GAME LOGIC
 
-// static inline void color_effects() {
-// 	--bg_colors_delay;
-// 	if (bg_colors_delay == 0) {
-// 		// rotate_colors_left(PAL_BACKGROUND*16, PAL_BACKGROUND*16+15);
-// 		glow_color(PAL_BACKGROUND*16+8, bg_color_glow, 5);
-
-// 		bg_colors_delay = 15;
-// 	}
-// }
-
-// inline void update_enemies() {
-// 	GameObject* ball = &balls_list[0];
-// 	for (u8 i = 0; i < MAX_OBJ; ++i, ++ball) {
-// 		ball->x += ball->speed_x;
-// 		ball->y += ball->speed_y;
-
-// 		GAMEOBJECT_update_boundbox(ball->x, ball->y, ball);
-// 		GAMEOBJECT_bounce_off_screen(ball);
-// 		SPR_setPosition(ball->sprite, ball->box.left, ball->box.top);
-// 	}
-// }
 
 static inline void game_update() {
 	handle_waves();
@@ -230,7 +208,6 @@ static inline void game_update() {
 	#endif
 	
 	#if MAP_SOLUTION == MAP_BY_COMPACT_MAP
-	// LEVEL_update_camera(&player);
 	#endif
 	// color_effects();
 }

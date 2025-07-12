@@ -11,6 +11,8 @@ SPRITE  spr_crow		  "sprites/enemy_crow.png"   2 2 FAST 5
 SPRITE  spr_eye 		  "sprites/enemy_eye.png"    2 2 FAST 5
 
 SPRITE  spr_player_shot   "sprites/player_shots.png" 2 2 FAST 0
+SPRITE spr_enemy_shot_a   "sprites/enemy_shots.png"  2 2 FAST 0
+
 
 OBJECTS waves1 "levels/level1/level1_waves.tmx" obj_layer "x:s16;y:s16;wave:u8;type:u8;behavior:u8" "sortby:wave"
 

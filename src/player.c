@@ -39,45 +39,56 @@ static inline bool on_ground();
 // Em src/player.c
 // Em src/player.c
 
+// Em src/player.c
+
+// Em src/player.c
+
 u16 PLAYER_init(u16 ind) {
-    // Guarda o índice de VRAM inicial para podermos calcular o total usado
+    // Guarda o índice de VRAM inicial para podermos calcular o total de tiles usados no final
     u16 initial_vram_index = ind;
 
-    // --- Inicializa o Jogador ---
+    // --- 1. Inicializa o Jogador ---
     // GAMEOBJECT_init retorna os tiles usados pelo sprite do jogador
     u16 player_tiles = GAMEOBJECT_init(&player, &spr_plat, SCREEN_W/2 - 12, SCREEN_H/2 - 12, -16, -16, PAL_PLAYER, ind);
-    ind += player_tiles; // Atualiza o 'ind' com os tiles do jogador
+    // Atualiza 'ind' com os tiles do jogador
+    ind += player_tiles;
 
     player.mana = 0;
     player.health = PLAYER_MAX_HEALTH;
 
-    // --- Inicializa os Tiros do Jogador ---
-    u16 bullet_color = RGB24_TO_VDPCOLOR(0xE00000); // Vermelho
-    PAL_setColor(PAL_MAP * 16 + 1, bullet_color);
+    // --- 2. Inicializa a Pool de Tiros do Jogador ---
+    // Define a cor do tiro na paleta do mapa
+    PAL_setColor(PAL_MAP * 16 + 1, RGB24_TO_VDPCOLOR(0xE00000));
 
-    // Inicializa a pool de tiros
+    // Usa a sua função de inicialização da pool com as suas variáveis estáticas
     GAMEOBJECT_pool_init(&player_bullet_pool, player_bullet_storage, player_bullet_nodes, MAX_PLAYER_BULLETS);
 
+    // --- 3. A Contabilidade Correta da VRAM ---
     // Contabiliza os tiles para a DEFINIÇÃO do sprite do tiro APENAS UMA VEZ
     if (MAX_PLAYER_BULLETS > 0) {
         // Esta é a única vez que incrementamos 'ind' para os tiros.
         ind += spr_player_shot.maxNumTile;
     }
 
-    // Pré-cria os sprites para todos os tiros na pool.
-    // O SGDK é esperto e irá reutilizar os tiles já carregados.
+    // --- 4. Pré-cria os Sprites para a Pool ---
+    // Percorremos o array de ARMAZENAMENTO ('player_bullet_storage')
+    // para associar um sprite a cada objeto da pool.
     for (u8 i = 0; i < MAX_PLAYER_BULLETS; i++) {
         GameObject* bullet = &player_bullet_storage[i];
         
-        // O índice de VRAM passado aqui é um "hint". Como os tiles já foram
-        // "contabilizados", o SGDK vai apenas usar os que já estão na VRAM.
-        // Passamos o início de onde os tiles do tiro foram carregados.
+        // A VRAM para os tiles já foi "reservada" acima. O SGDK irá reutilizá-la.
+        // O índice de VRAM passado aqui é o início de onde os tiles do tiro foram carregados.
+        // É importante passar um índice de VRAM consistente e válido.
         GAMEOBJECT_init(bullet, &spr_player_shot, -64, -64, 0, 0, PAL_MAP, (initial_vram_index + player_tiles));
 
+        // Deixamos o objeto pronto, mas inativo, para ser pego pela pool
+        bullet->health = 0;
+        SPR_setVisibility(bullet->sprite, HIDDEN);
         SPR_setAnimAndFrame(bullet->sprite, 0, 0);
         SPR_setAnimationLoop(bullet->sprite, FALSE);
     }
 
+    // --- 5. Retorna o Valor Correto ---
     // Retorna o NÚMERO TOTAL de tiles que esta função realmente consumiu
     return (ind - initial_vram_index);
 }
@@ -173,11 +184,13 @@ void PLAYER_update_bullets() {
 		SPR_setPosition(bullet->sprite, bullet->box.left + bullet->w_offset, bullet->box.top + bullet->h_offset);
 
 		bool should_be_freed = FALSE;
-		if (bullet->box.left > SCREEN_W) { 
+		if (bullet->box.left > SCREEN_W || bullet->health <= 0) { 
             should_be_freed = TRUE;
         } 
 
 		if (should_be_freed) {
+			bullet->health = 0; // "mata" o tiro
+			SPR_setVisibility(bullet->sprite, HIDDEN);
             GAMEOBJECT_pool_free(&player_bullet_pool, bullet);
         }
 
